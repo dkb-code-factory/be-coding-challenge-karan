@@ -1,0 +1,156 @@
+databaseChangeLog:
+  - property:
+      name: uuid_function
+      value: uuid_generate_v4()
+      dbms: postgresql
+  - changeSet:
+      id: "0002-create-uuid-ossp-extension"
+      author: ""
+      changes:
+        - sql:
+            sql: "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+      rollback:
+        - sql:
+            sql: "DROP EXTENSION IF EXISTS \"uuid-ossp\";"
+  - changeSet:
+      id: "0002-insert-users-data"
+      author: ""
+      changes:
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value: "type1"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value: "type1"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value: "type1;type2"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value: "type1;type2"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value: "type1;type2;type3"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type4"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type4"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type4;type5"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type4;type5"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type1;type4"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type1;type2;type4"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type1;type2;type4;type5"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type1;type2;type3;type4"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "id"
+                  valueComputed: ${uuid_function}
+              - column:
+                  name: "notifications"
+                  value:
+                    "type1;type2;type3;type4;type5"
+      rollback:
+        - delete:
+            tableName: "users"

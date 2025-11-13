@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - property:
+      name: "uuidType"
+      value: "uuid"
+      dbms: "postgresql"
+  - include:
+      file: "db.changelog-0001-create-users-table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "db.changelog-0002-insert-users-table.yaml"
+      relativeToChangelogFile: true

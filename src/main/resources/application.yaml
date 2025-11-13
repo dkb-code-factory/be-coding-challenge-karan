@@ -1,0 +1,14 @@
+spring.application.name: code-challenge
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/codechallenge_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-main.yaml
+logging:
+  level:
+   org.hibernate.SQL: DEBUG
