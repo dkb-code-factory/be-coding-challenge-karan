@@ -13,6 +13,7 @@ class NotificationCatalog {
                 NotificationType.type1,
                 NotificationType.type2,
                 NotificationType.type3,
+                NotificationType.type6,
             ),
             NotificationCategory.B to setOf(
                 NotificationType.type4,

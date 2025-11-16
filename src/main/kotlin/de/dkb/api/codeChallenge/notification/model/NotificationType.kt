@@ -10,6 +10,7 @@ enum class NotificationType {
     type3,
     type4,
     type5,
+    type6,
 }
 
 @Converter
@@ -17,7 +18,7 @@ class NotificationTypeSetConverter : AttributeConverter<MutableSet<NotificationT
 
     override fun convertToDatabaseColumn(valueSet: MutableSet<NotificationType>?): String =
         valueSet.orEmpty()
-            .joinToString(separator = ";") { it.name }
+            .joinToString(separator = ";") { it.name.trim() }
 
     override fun convertToEntityAttribute(databaseString: String?): MutableSet<NotificationType> =
         databaseString.orEmpty()
