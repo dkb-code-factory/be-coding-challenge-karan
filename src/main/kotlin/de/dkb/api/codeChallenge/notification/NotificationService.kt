@@ -18,18 +18,44 @@ class NotificationService(
     private val userSubscribedCategoryRepository: UserSubscribedCategoryRepository,
 ) {
 
-    @Transactional
-    fun registerUser(user: User): User {
-        // Save user with notification types (legacy)
-        val savedUser = userRepository.save(user)
+    data class RegistrationResult(
+        val user: User,
+        val wasCreated: Boolean,
+        val wasUpdated: Boolean,
+    )
 
+    @Transactional
+    fun registerUser(user: User): RegistrationResult {
+        // Check if user already exists
+        val existingUser = userRepository.findById(user.id).orElse(null)
+        val notificationsChanged = existingUser?.notifications != user.notifications
+
+        val savedUser = if (existingUser != null) {
+            // User exists - update notifications if different (idempotent: same data = no change)
+            if (notificationsChanged) {
+                existingUser.notifications = user.notifications
+                userRepository.save(existingUser)
+            } else {
+                // Same data - idempotent, return existing user (skip category logic)
+                return RegistrationResult(
+                    user = existingUser,
+                    wasCreated = false,
+                    wasUpdated = false,
+                )
+            }
+        } else {
+            // New user - save
+            userRepository.save(user)
+        }
+
+        // Only process category subscriptions if it's a new user or notifications changed
         // Derive categories from notification types and save to user_subscribed_category
-        val typeCategories = notificationTypeCategoryRepository.findByNotificationTypeIn(user.notifications.toList())
+        val typeCategories = notificationTypeCategoryRepository.findByNotificationTypeIn(savedUser.notifications.toList())
 
         // Get distinct categories
         val categories = typeCategories.map { it.category }.distinct()
 
-        // Save category subscriptions
+        // Save category subscriptions (idempotent: only if not exists)
         categories.forEach { category ->
             if (!userSubscribedCategoryRepository.existsByUserIdAndCategory(savedUser.id, category)) {
                 userSubscribedCategoryRepository.save(
@@ -41,7 +67,22 @@ class NotificationService(
             }
         }
 
-        return savedUser
+        // Remove category subscriptions that are no longer needed (only if notifications changed)
+        if (notificationsChanged && existingUser != null) {
+            val existingSubscriptions = userSubscribedCategoryRepository.findByUserId(savedUser.id)
+            val currentCategories = categories.toSet()
+            val subscriptionsToRemove = existingSubscriptions.filter { it.category !in currentCategories }
+
+            subscriptionsToRemove.forEach { subscription ->
+                userSubscribedCategoryRepository.delete(subscription)
+            }
+        }
+
+        return RegistrationResult(
+            user = savedUser,
+            wasCreated = existingUser == null,
+            wasUpdated = notificationsChanged && existingUser != null,
+        )
     }
 
     fun sendNotification(notificationDto: NotificationDto): ResponseEntity<Map<String, String>> {

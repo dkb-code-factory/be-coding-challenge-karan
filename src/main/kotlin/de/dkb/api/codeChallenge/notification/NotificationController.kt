@@ -11,8 +11,35 @@ import org.springframework.web.bind.annotation.*
 class NotificationController(private val notificationService: NotificationService) {
 
     @PostMapping("/register")
-    fun registerUser(@RequestBody user: User) =
-        notificationService.registerUser(user)
+    fun registerUser(@RequestBody user: User): ResponseEntity<Map<String, Any>> {
+        val result = notificationService.registerUser(user)
+        return when {
+            result.wasCreated -> {
+                ResponseEntity.status(HttpStatus.CREATED).body(
+                    mapOf(
+                        "message" to "User registered successfully",
+                        "user" to result.user,
+                    ),
+                )
+            }
+            result.wasUpdated -> {
+                ResponseEntity.ok(
+                    mapOf(
+                        "message" to "User updated successfully",
+                        "user" to result.user,
+                    ),
+                )
+            }
+            else -> {
+                ResponseEntity.ok(
+                    mapOf(
+                        "message" to "User already exists with the same data",
+                        "user" to result.user,
+                    ),
+                )
+            }
+        }
+    }
 
     @PostMapping("/notify")
     fun sendNotification(@RequestBody notificationDto: NotificationDto): ResponseEntity<Map<String, String>> =
