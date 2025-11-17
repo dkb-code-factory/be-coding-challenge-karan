@@ -22,6 +22,13 @@ spring:
     properties:
       hibernate:
         format_sql: true                 # Format SQL for better readability
+    show-sql: false                      # Disable SQL logging in production (use DEBUG level if needed)
+
+  # Cache configuration
+  cache:
+    type: caffeine                       # Use Caffeine cache implementation
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=1h
 
 # Actuator configuration
 management:
@@ -35,5 +42,5 @@ management:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
+   org.hibernate.SQL: DEBUG
     de.dkb.api.codeChallenge: INFO      # Application logging level

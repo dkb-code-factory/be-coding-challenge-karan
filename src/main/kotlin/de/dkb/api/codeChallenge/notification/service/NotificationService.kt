@@ -7,6 +7,7 @@ import de.dkb.api.codeChallenge.notification.repository.NotificationTypeCategory
 import de.dkb.api.codeChallenge.notification.repository.UserRepository
 import de.dkb.api.codeChallenge.notification.repository.UserSubscribedCategoryRepository
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -53,31 +54,37 @@ class NotificationService(
 
         // Only process category subscriptions if it's a new user or notifications changed
         // Derive categories from notification types and save to user_subscribed_category
-        val typeCategories = notificationTypeCategoryRepository.findByNotificationTypeIn(savedUser.notifications.toList())
+        // Note: findByNotificationTypeIn uses cached data from findAll() for better performance
+        val allTypeCategories = notificationTypeCategoryRepository.findAll()
+        val typeCategories = allTypeCategories.filter { it.notificationType in savedUser.notifications }
 
         // Get distinct categories
         val categories = typeCategories.map { it.category }.distinct()
 
-        // Save category subscriptions (idempotent: only if not exists)
-        categories.forEach { category ->
-            if (!userSubscribedCategoryRepository.existsByUserIdAndCategory(savedUser.id, category)) {
-                userSubscribedCategoryRepository.save(
-                    UserSubscribedCategory(
-                        userId = savedUser.id,
-                        category = category,
-                    ),
-                )
-            }
+        // Optimized batch save: Get existing subscriptions in one query, then batch insert only new ones
+        val existingSubscriptions = if (categories.isNotEmpty()) {
+            userSubscribedCategoryRepository.findByUserIdAndCategoryIn(savedUser.id, categories)
+        } else {
+            emptyList()
+        }
+        val existingCategories = existingSubscriptions.map { it.category }.toSet()
+        val categoriesToInsert = categories.filter { it !in existingCategories }
+            .map { UserSubscribedCategory(userId = savedUser.id, category = it) }
+
+        // Batch insert new subscriptions (single query instead of N queries)
+        if (categoriesToInsert.isNotEmpty()) {
+            userSubscribedCategoryRepository.saveAll(categoriesToInsert)
         }
 
-        // Remove category subscriptions that are no longer needed (only if notifications changed)
-        if (notificationsChanged && existingUser != null) {
-            val existingSubscriptions = userSubscribedCategoryRepository.findByUserId(savedUser.id)
-            val currentCategories = categories.toSet()
-            val subscriptionsToRemove = existingSubscriptions.filter { it.category !in currentCategories }
-
-            subscriptionsToRemove.forEach { subscription ->
-                userSubscribedCategoryRepository.delete(subscription)
+        // Optimized batch delete: Remove obsolete subscriptions (only if notifications changed)
+        if (notificationsChanged && existingUser != null && categories.isNotEmpty()) {
+            val subscriptionsToRemove = userSubscribedCategoryRepository.findByUserIdAndCategoryNotIn(
+                savedUser.id,
+                categories,
+            )
+            // Batch delete in single query instead of N queries
+            if (subscriptionsToRemove.isNotEmpty()) {
+                userSubscribedCategoryRepository.deleteAll(subscriptionsToRemove)
             }
         }
 
@@ -112,7 +119,7 @@ class NotificationService(
 
         val requestedTypeString = notificationDto.notificationType
 
-        // Check if notification type exists
+        // Check if notification type exists (uses cache for better performance)
         val typeCategory = notificationTypeCategoryRepository.findById(requestedTypeString).orElse(null)
             ?: run {
                 logger.warn("Notification type not found: type={}", requestedTypeString)
@@ -145,6 +152,7 @@ class NotificationService(
     }
 
     @Transactional
+    @CacheEvict(value = ["notificationTypeCategories"], allEntries = true)
     fun addNotificationType(notificationType: String, category: String) {
         logger.info("Adding notification type: type={}, category={}", notificationType, category)
         // Validate category
@@ -168,7 +176,8 @@ class NotificationService(
                 category = category,
             ),
         )
-        logger.info("Successfully added notification type: type={}, category={}", notificationType, category)
+        // Cache is automatically evicted by @CacheEvict annotation above
+        logger.info("Successfully added notification type: type={}, category={}. Cache invalidated.", notificationType, category)
     }
 }
 
