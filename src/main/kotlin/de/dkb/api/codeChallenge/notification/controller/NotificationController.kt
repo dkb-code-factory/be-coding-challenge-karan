@@ -1,8 +1,9 @@
-package de.dkb.api.codeChallenge.notification
+package de.dkb.api.codeChallenge.notification.controller
 
-import de.dkb.api.codeChallenge.notification.model.AddNotificationTypeRequest
-import de.dkb.api.codeChallenge.notification.model.NotificationDto
+import de.dkb.api.codeChallenge.notification.dto.AddNotificationTypeRequest
+import de.dkb.api.codeChallenge.notification.dto.NotificationDto
 import de.dkb.api.codeChallenge.notification.model.User
+import de.dkb.api.codeChallenge.notification.service.NotificationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -56,3 +57,4 @@ class NotificationController(private val notificationService: NotificationServic
         }
     }
 }
+

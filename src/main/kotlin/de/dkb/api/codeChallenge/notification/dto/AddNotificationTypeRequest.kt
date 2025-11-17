@@ -1,4 +1,4 @@
-package de.dkb.api.codeChallenge.notification.model
+package de.dkb.api.codeChallenge.notification.dto
 
 data class AddNotificationTypeRequest(
     val notificationType: String,

@@ -1,4 +1,4 @@
-package de.dkb.api.codeChallenge.notification.model
+package de.dkb.api.codeChallenge.notification.dto
 
 import java.util.UUID
 
@@ -7,3 +7,4 @@ data class NotificationDto(
     val notificationType: String,
     val message: String,
 )
+

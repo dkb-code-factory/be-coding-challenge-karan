@@ -1,11 +1,11 @@
-package de.dkb.api.codeChallenge.notification
+package de.dkb.api.codeChallenge.notification.service
 
-import de.dkb.api.codeChallenge.notification.model.NotificationDto
-import de.dkb.api.codeChallenge.notification.model.NotificationTypeCategoryRepository
+import de.dkb.api.codeChallenge.notification.dto.NotificationDto
 import de.dkb.api.codeChallenge.notification.model.User
-import de.dkb.api.codeChallenge.notification.model.UserRepository
 import de.dkb.api.codeChallenge.notification.model.UserSubscribedCategory
-import de.dkb.api.codeChallenge.notification.model.UserSubscribedCategoryRepository
+import de.dkb.api.codeChallenge.notification.repository.NotificationTypeCategoryRepository
+import de.dkb.api.codeChallenge.notification.repository.UserRepository
+import de.dkb.api.codeChallenge.notification.repository.UserSubscribedCategoryRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -137,3 +137,4 @@ class NotificationService(
         )
     }
 }
+
