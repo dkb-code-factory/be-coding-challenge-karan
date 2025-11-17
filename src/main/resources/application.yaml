@@ -5,11 +5,35 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+    hikari:
+      # Connection pool configuration
+      minimum-idle: 5                    # Minimum connections in pool
+      maximum-pool-size: 20              # Maximum connections in pool
+      connection-timeout: 30000          # 30 seconds to wait for connection
+      idle-timeout: 600000               # 10 minutes before idle connection is removed
+      max-lifetime: 1800000              # 30 minutes max connection lifetime
+      leak-detection-threshold: 60000    # Warn if connection not returned in 60 seconds
 
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-main.yaml
 
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true                 # Format SQL for better readability
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics     # Expose health, info, and basic metrics endpoints
+  endpoint:
+    health:
+      show-details: when-authorized      # Show health details when authorized
+
 logging:
   level:
-   org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: DEBUG
+    de.dkb.api.codeChallenge: INFO      # Application logging level

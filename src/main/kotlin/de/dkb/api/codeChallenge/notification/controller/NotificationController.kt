@@ -23,6 +23,9 @@ class NotificationController(private val notificationService: NotificationServic
                     ),
                 )
             }
+            //we can create a separate endpoint for updating explicitly, but
+            // as it is mentioned that the endpoint is already used by
+            //considerable users, so does not make sense to have a new endpoint for now
             result.wasUpdated -> {
                 ResponseEntity.ok(
                     mapOf(
@@ -31,6 +34,7 @@ class NotificationController(private val notificationService: NotificationServic
                     ),
                 )
             }
+
             else -> {
                 ResponseEntity.ok(
                     mapOf(
