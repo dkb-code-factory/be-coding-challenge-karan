@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/codechallenge_db
+    username: postgres
+    password: postgres
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true  # Enable SQL logging in dev
+
+# Actuator configuration - more verbose in dev
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops
+  endpoint:
+    health:
+      show-details: always  # Show all details in dev
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    de.dkb.api.codeChallenge: DEBUG  # More verbose logging in dev
+

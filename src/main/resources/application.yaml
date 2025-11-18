@@ -1,18 +1,24 @@
-spring.application.name: code-challenge
 spring:
+  application:
+    name: code-challenge
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}  # Default to dev, override with env var
+  
   datasource:
-    url: jdbc:postgresql://localhost:5432/codechallenge_db
-    username: postgres
-    password: postgres
+    # Use environment variables for sensitive data, with defaults for local development
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/codechallenge_db}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
-      # Connection pool configuration
-      minimum-idle: 5                    # Minimum connections in pool
-      maximum-pool-size: 20              # Maximum connections in pool
-      connection-timeout: 30000          # 30 seconds to wait for connection
-      idle-timeout: 600000               # 10 minutes before idle connection is removed
-      max-lifetime: 1800000              # 30 minutes max connection lifetime
-      leak-detection-threshold: 60000    # Warn if connection not returned in 60 seconds
+      # Connection pool configuration - can be overridden per environment
+      minimum-idle: ${HIKARI_MIN_IDLE:5}
+      maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:20}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
 
   liquibase:
     enabled: true
@@ -21,26 +27,27 @@ spring:
   jpa:
     properties:
       hibernate:
-        format_sql: true                 # Format SQL for better readability
-    show-sql: false                      # Disable SQL logging in production (use DEBUG level if needed)
+        format_sql: ${HIBERNATE_FORMAT_SQL:false}
+    show-sql: false
 
-  # Cache configuration
+  # Cache configuration - can be overridden per environment
   cache:
-    type: caffeine                       # Use Caffeine cache implementation
+    type: caffeine
     caffeine:
-      spec: maximumSize=1000,expireAfterWrite=1h
+      spec: maximumSize=${CACHE_MAX_SIZE:1000},expireAfterWrite=${CACHE_EXPIRE_HOURS:1}h
 
 # Actuator configuration
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics     # Expose health, info, and basic metrics endpoints
+        include: health,info,metrics
   endpoint:
     health:
-      show-details: when-authorized      # Show health details when authorized
+      show-details: when-authorized
 
+# Default logging - can be overridden per environment
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    de.dkb.api.codeChallenge: INFO      # Application logging level
+    root: INFO
+    de.dkb.api.codeChallenge: INFO
