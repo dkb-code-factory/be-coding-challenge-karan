@@ -42,5 +42,5 @@ management:
 
 logging:
   level:
-   org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: DEBUG
     de.dkb.api.codeChallenge: INFO      # Application logging level

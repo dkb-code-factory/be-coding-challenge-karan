@@ -1,6 +1,6 @@
 package de.dkb.api.codeChallenge.notification.controller
 
-import de.dkb.api.codeChallenge.notification.dto.AddNotificationTypeRequest
+import de.dkb.api.codeChallenge.notification.dto.AddNotificationTypeDto
 import de.dkb.api.codeChallenge.notification.dto.NotificationDto
 import de.dkb.api.codeChallenge.notification.model.User
 import de.dkb.api.codeChallenge.notification.service.NotificationService
@@ -51,7 +51,7 @@ class NotificationController(private val notificationService: NotificationServic
         notificationService.sendNotification(notificationDto)
 
     @PostMapping("/admin/notification-types")
-    fun addNotificationType(@RequestBody request: AddNotificationTypeRequest): ResponseEntity<Map<String, String>> {
+    fun addNotificationType(@RequestBody request: AddNotificationTypeDto): ResponseEntity<Map<String, String>> {
         return try {
             notificationService.addNotificationType(request.notificationType, request.category)
             ResponseEntity.ok(mapOf("message" to "Notification type '${request.notificationType}' added to category '${request.category}'"))

@@ -1,7 +1,7 @@
 package de.dkb.api.codeChallenge.notification.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import de.dkb.api.codeChallenge.notification.dto.AddNotificationTypeRequest
+import de.dkb.api.codeChallenge.notification.dto.AddNotificationTypeDto
 import de.dkb.api.codeChallenge.notification.dto.NotificationDto
 import de.dkb.api.codeChallenge.notification.model.NotificationTypeCategory
 import de.dkb.api.codeChallenge.notification.model.User
@@ -174,7 +174,7 @@ class NotificationControllerIntegrationTest {
 
     @Test
     fun `POST admin notification-types should add new notification type`() {
-        val request = AddNotificationTypeRequest("type7", "B")
+        val request = AddNotificationTypeDto("type7", "B")
 
         mockMvc.perform(
             post("/admin/notification-types")
@@ -191,7 +191,7 @@ class NotificationControllerIntegrationTest {
     @Test
     fun `POST admin notification-types should return 400 when type already exists`() {
         notificationTypeCategoryRepository.save(NotificationTypeCategory("type7", "B"))
-        val request = AddNotificationTypeRequest("type7", "B")
+        val request = AddNotificationTypeDto("type7", "B")
 
         mockMvc.perform(
             post("/admin/notification-types")
@@ -204,7 +204,7 @@ class NotificationControllerIntegrationTest {
 
     @Test
     fun `POST admin notification-types should return 400 when category is invalid`() {
-        val request = AddNotificationTypeRequest("type7", "C")
+        val request = AddNotificationTypeDto("type7", "C")
 
         mockMvc.perform(
             post("/admin/notification-types")

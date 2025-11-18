@@ -31,7 +31,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-cache")
 	implementation("com.github.ben-manes.caffeine:caffeine")
-	implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:8.10.1")
 	implementation("org.springframework.kafka:spring-kafka")
 
 	// JSON serialization/deserialization

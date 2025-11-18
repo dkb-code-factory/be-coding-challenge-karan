@@ -38,8 +38,6 @@ class GlobalExceptionHandler {
     @ExceptionHandler(Exception::class)
     fun handleGenericException(ex: Exception): ResponseEntity<Map<String, String>> {
         logger.error("Unexpected error occurred: {}", ex.message, ex)
-        // In production, you might want to hide internal error details
-        // For now, we'll log the full exception but return a generic message
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(mapOf("error" to "An unexpected error occurred. Please try again later."))
     }
