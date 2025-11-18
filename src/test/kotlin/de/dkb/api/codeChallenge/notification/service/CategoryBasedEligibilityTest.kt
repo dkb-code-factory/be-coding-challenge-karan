@@ -6,13 +6,14 @@ import de.dkb.api.codeChallenge.notification.model.User
 import de.dkb.api.codeChallenge.notification.repository.NotificationTypeCategoryRepository
 import de.dkb.api.codeChallenge.notification.repository.UserRepository
 import de.dkb.api.codeChallenge.notification.repository.UserSubscribedCategoryRepository
+import de.dkb.api.codeChallenge.notification.exception.UserNotSubscribedException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
-import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestPropertySource
 import java.util.UUID
 
@@ -71,10 +72,8 @@ class CategoryBasedEligibilityTest {
         // When - send notification with type6 (also Category A, but user doesn't have it in notifications)
         val notificationDto = NotificationDto(userId = userId, notificationType = "type6", message = "Category A notification")
 
-        val response = notificationService.sendNotification(notificationDto)
-
-        // Then - should receive notification because both are in Category A
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        // Then - should receive notification because both are in Category A (no exception thrown)
+        notificationService.sendNotification(notificationDto)
     }
 
     @Test
@@ -95,10 +94,8 @@ class CategoryBasedEligibilityTest {
         // When - send notification with type7 (user doesn't have it in their notifications)
         val notificationDto = NotificationDto(userId = userId, notificationType = "type7", message = "New Category B type")
 
-        val response = notificationService.sendNotification(notificationDto)
-
-        // Then - should receive notification because user has Category B subscription
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        // Then - should receive notification because user has Category B subscription (no exception thrown)
+        notificationService.sendNotification(notificationDto)
     }
 
     @Test
@@ -111,10 +108,10 @@ class CategoryBasedEligibilityTest {
         // When - send notification with type4 (Category B)
         val notificationDto = NotificationDto(userId = userId, notificationType = "type4", message = "Category B notification")
 
-        val response = notificationService.sendNotification(notificationDto)
-
         // Then - should NOT receive notification (different category)
-        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+        assertThrows<UserNotSubscribedException> {
+            notificationService.sendNotification(notificationDto)
+        }
     }
 
     @Test
@@ -131,17 +128,13 @@ class CategoryBasedEligibilityTest {
 
         // When - send notification with type6 (Category A)
         val notificationDtoA = NotificationDto(userId = userId, notificationType = "type6", message = "Category A")
-        val responseA = notificationService.sendNotification(notificationDtoA)
-
-        // Then - should receive Category A notification
-        assertThat(responseA.statusCode).isEqualTo(HttpStatus.OK)
+        notificationService.sendNotification(notificationDtoA)
 
         // When - send notification with type5 (Category B)
         val notificationDtoB = NotificationDto(userId = userId, notificationType = "type5", message = "Category B")
-        val responseB = notificationService.sendNotification(notificationDtoB)
+        notificationService.sendNotification(notificationDtoB)
 
-        // Then - should receive Category B notification
-        assertThat(responseB.statusCode).isEqualTo(HttpStatus.OK)
+        // Then - both should succeed (no exceptions thrown)
     }
 
     @Test
@@ -156,9 +149,8 @@ class CategoryBasedEligibilityTest {
 
         categoryATypes.forEach { type ->
             val notificationDto = NotificationDto(userId = userId, notificationType = type, message = "Category A: $type")
-            val response = notificationService.sendNotification(notificationDto)
-            assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-                .withFailMessage("User should receive notification for $type (Category A)")
+            // Should not throw exception - user should receive notification for all Category A types
+            notificationService.sendNotification(notificationDto)
         }
     }
 }

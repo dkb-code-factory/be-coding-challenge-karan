@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
-import org.springframework.http.HttpStatus
+import org.junit.jupiter.api.assertThrows
 import org.springframework.test.context.TestPropertySource
 import java.util.UUID
 
@@ -160,11 +160,8 @@ class NotificationServiceTest {
 
         val notificationDto = NotificationDto(userId = userId, notificationType = "type1", message = "Test message")
 
-        // When
-        val response = notificationService.sendNotification(notificationDto)
-
-        // Then
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        // When/Then - should not throw exception
+        notificationService.sendNotification(notificationDto)
     }
 
     @Test
@@ -179,11 +176,8 @@ class NotificationServiceTest {
 
         val notificationDto = NotificationDto(userId = userId, notificationType = "type6", message = "Test message")
 
-        // When
-        val response = notificationService.sendNotification(notificationDto)
-
-        // Then
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        // When/Then - should not throw exception
+        notificationService.sendNotification(notificationDto)
     }
 
     @Test
@@ -195,28 +189,26 @@ class NotificationServiceTest {
 
         val notificationDto = NotificationDto(userId = userId, notificationType = "type4", message = "Test message") // Category B
 
-        // When
-        val response = notificationService.sendNotification(notificationDto)
-
-        // Then
-        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+        // When/Then
+        assertThrows<de.dkb.api.codeChallenge.notification.exception.UserNotSubscribedException> {
+            notificationService.sendNotification(notificationDto)
+        }
     }
 
     @Test
-    fun `should return NOT_FOUND when user does not exist`() {
+    fun `should throw exception when user does not exist`() {
         // Given
         val nonExistentUserId = UUID.randomUUID()
         val notificationDto = NotificationDto(userId = nonExistentUserId, notificationType = "type1", message = "Test")
 
-        // When
-        val response = notificationService.sendNotification(notificationDto)
-
-        // Then
-        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+        // When/Then
+        assertThrows<de.dkb.api.codeChallenge.notification.exception.UserNotFoundException> {
+            notificationService.sendNotification(notificationDto)
+        }
     }
 
     @Test
-    fun `should return BAD_REQUEST when notification type does not exist`() {
+    fun `should throw exception when notification type does not exist`() {
         // Given
         val userId = UUID.randomUUID()
         val user = User(id = userId, notifications = mutableSetOf("type1"))
@@ -224,11 +216,10 @@ class NotificationServiceTest {
 
         val notificationDto = NotificationDto(userId = userId, notificationType = "nonexistent", message = "Test")
 
-        // When
-        val response = notificationService.sendNotification(notificationDto)
-
-        // Then
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        // When/Then
+        assertThrows<de.dkb.api.codeChallenge.notification.exception.NotificationTypeNotFoundException> {
+            notificationService.sendNotification(notificationDto)
+        }
     }
 
     @Test
@@ -248,7 +239,7 @@ class NotificationServiceTest {
         notificationService.addNotificationType("type7", "B")
 
         // When/Then
-        org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             notificationService.addNotificationType("type7", "B")
         }
     }
@@ -256,7 +247,7 @@ class NotificationServiceTest {
     @Test
     fun `should throw exception when adding notification type with invalid category`() {
         // When/Then
-        org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+        assertThrows<IllegalArgumentException> {
             notificationService.addNotificationType("type7", "C")
         }
     }
@@ -273,11 +264,8 @@ class NotificationServiceTest {
 
         val notificationDto = NotificationDto(userId = userId, notificationType = "type7", message = "New type!")
 
-        // When
-        val response = notificationService.sendNotification(notificationDto)
-
-        // Then
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        // When/Then - should not throw exception
+        notificationService.sendNotification(notificationDto)
     }
 }
 

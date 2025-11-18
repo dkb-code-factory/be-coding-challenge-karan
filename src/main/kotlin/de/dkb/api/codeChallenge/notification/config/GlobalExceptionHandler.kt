@@ -1,5 +1,8 @@
 package de.dkb.api.codeChallenge.notification.config
 
+import de.dkb.api.codeChallenge.notification.exception.NotificationTypeNotFoundException
+import de.dkb.api.codeChallenge.notification.exception.UserNotSubscribedException
+import de.dkb.api.codeChallenge.notification.exception.UserNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,6 +21,27 @@ class GlobalExceptionHandler {
         logger.error("Illegal argument exception: {}", ex.message, ex)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(mapOf("error" to (ex.message ?: "Invalid request")))
+    }
+
+    @ExceptionHandler(UserNotFoundException::class)
+    fun handleUserNotFoundException(ex: UserNotFoundException): ResponseEntity<Map<String, String>> {
+        logger.warn("User not found: {}", ex.message)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(mapOf("error" to (ex.message ?: "User not found")))
+    }
+
+    @ExceptionHandler(NotificationTypeNotFoundException::class)
+    fun handleNotificationTypeNotFoundException(ex: NotificationTypeNotFoundException): ResponseEntity<Map<String, String>> {
+        logger.warn("Notification type not found: {}", ex.message)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(mapOf("error" to (ex.message ?: "Notification type not found")))
+    }
+
+    @ExceptionHandler(UserNotSubscribedException::class)
+    fun handleUserNotSubscribedException(ex: UserNotSubscribedException): ResponseEntity<Map<String, String>> {
+        logger.warn("User not subscribed: {}", ex.message)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(mapOf("error" to (ex.message ?: "User not subscribed")))
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)

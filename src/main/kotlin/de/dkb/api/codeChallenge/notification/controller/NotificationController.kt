@@ -23,9 +23,8 @@ class NotificationController(private val notificationService: NotificationServic
                     ),
                 )
             }
-            //we can create a separate endpoint for updating explicitly, but
-            // as it is mentioned that the endpoint is already used by
-            //considerable users, so does not make sense to have a new endpoint for now
+            // We could create a separate endpoint for updating explicitly, but
+            // since the endpoint is already used by many clients, it doesn't make sense to change it now
             result.wasUpdated -> {
                 ResponseEntity.ok(
                     mapOf(
@@ -47,18 +46,15 @@ class NotificationController(private val notificationService: NotificationServic
     }
 
     @PostMapping("/notify")
-    fun sendNotification(@RequestBody notificationDto: NotificationDto): ResponseEntity<Map<String, String>> =
+    fun sendNotification(@RequestBody notificationDto: NotificationDto): ResponseEntity<Map<String, String>> {
         notificationService.sendNotification(notificationDto)
+        return ResponseEntity.ok(mapOf("message" to "Notification sent successfully"))
+    }
 
     @PostMapping("/admin/notification-types")
     fun addNotificationType(@RequestBody request: AddNotificationTypeDto): ResponseEntity<Map<String, String>> {
-        return try {
-            notificationService.addNotificationType(request.notificationType, request.category)
-            ResponseEntity.ok(mapOf("message" to "Notification type '${request.notificationType}' added to category '${request.category}'"))
-        } catch (e: IllegalArgumentException) {
-            val errorMessage: String = e.message ?: "Invalid request"
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to errorMessage))
-        }
+        notificationService.addNotificationType(request.notificationType, request.category)
+        return ResponseEntity.ok(mapOf("message" to "Notification type '${request.notificationType}' added to category '${request.category}'"))
     }
 }
 
