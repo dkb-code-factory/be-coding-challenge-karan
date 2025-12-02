@@ -2,32 +2,23 @@ package de.dkb.api.codeChallenge
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.DynamicPropertySource
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 
-@Testcontainers
 @SpringBootTest
+@ActiveProfiles("test")
+@TestPropertySource(
+	properties = [
+		"spring.jpa.hibernate.ddl-auto=create-drop",
+		"spring.datasource.url=jdbc:h2:mem:testdb;",
+		"spring.datasource.driverClassName=org.h2.Driver",
+		"spring.datasource.username=sa",
+		"spring.datasource.password=",
+		"spring.liquibase.enabled=false",
+		"spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration"
+	]
+)
 class CodeChallengeApplicationTests {
-
-	companion object {
-		@Container
-		val postgres = PostgreSQLContainer("postgres:15")
-
-		@JvmStatic
-		@DynamicPropertySource
-		@Suppress("unused", "UsePropertyAccessSyntax")
-		fun registerPgProperties(registry: org.springframework.test.context.DynamicPropertyRegistry) {
-			registry.add("spring.datasource.url", postgres::getJdbcUrl)
-			registry.add("spring.datasource.username", postgres::getUsername)
-			registry.add("spring.datasource.password", postgres::getPassword)
-		}
-	}
-
-	init {
-	    postgres.start()
-	}
 
 	@Test
 	fun contextLoads() {

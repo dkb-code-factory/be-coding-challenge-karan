@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0003-create-notification-type-category-table"
+      author: ""
+      changes:
+        - createTable:
+            tableName: "notification_type_category"
+            columns:
+              - column:
+                  name: "notification_type"
+                  type: "varchar(50)"
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: "pk_notification_type"
+                    nullable: false
+              - column:
+                  name: "category"
+                  type: "varchar(10)"
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: "idx_notification_type_category_category"
+            tableName: "notification_type_category"
+            columns:
+              - column:
+                  name: "category"
+      rollback:
+        - dropTable:
+            tableName: "notification_type_category"
+

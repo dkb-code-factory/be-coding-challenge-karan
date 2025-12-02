@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0004-populate-notification-type-category"
+      author: ""
+      changes:
+        - insert:
+            tableName: "notification_type_category"
+            columns:
+              - column:
+                  name: "notification_type"
+                  value: "type1"
+              - column:
+                  name: "category"
+                  value: "A"
+        - insert:
+            tableName: "notification_type_category"
+            columns:
+              - column:
+                  name: "notification_type"
+                  value: "type2"
+              - column:
+                  name: "category"
+                  value: "A"
+        - insert:
+            tableName: "notification_type_category"
+            columns:
+              - column:
+                  name: "notification_type"
+                  value: "type3"
+              - column:
+                  name: "category"
+                  value: "A"
+        - insert:
+            tableName: "notification_type_category"
+            columns:
+              - column:
+                  name: "notification_type"
+                  value: "type4"
+              - column:
+                  name: "category"
+                  value: "B"
+        - insert:
+            tableName: "notification_type_category"
+            columns:
+              - column:
+                  name: "notification_type"
+                  value: "type5"
+              - column:
+                  name: "category"
+                  value: "B"
+        - insert:
+            tableName: "notification_type_category"
+            columns:
+              - column:
+                  name: "notification_type"
+                  value: "type6"
+              - column:
+                  name: "category"
+                  value: "A"
+      rollback:
+        - delete:
+            tableName: "notification_type_category"
+

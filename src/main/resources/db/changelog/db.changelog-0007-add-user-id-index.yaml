@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0007-add-user-id-index"
+      author: ""
+      changes:
+        - createIndex:
+            indexName: "idx_user_subscribed_category_user_id"
+            tableName: "user_subscribed_category"
+            columns:
+              - column:
+                  name: "user_id"
+      rollback:
+        - dropIndex:
+            indexName: "idx_user_subscribed_category_user_id"
+            tableName: "user_subscribed_category"
+

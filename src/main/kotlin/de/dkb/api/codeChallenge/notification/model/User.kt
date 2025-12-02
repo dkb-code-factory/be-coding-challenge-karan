@@ -16,7 +16,7 @@ data class User(
     val id: UUID,
     @field:NotNull
     @Convert(converter = NotificationTypeSetConverter::class)
-    var notifications: MutableSet<NotificationType> = mutableSetOf(),
+    var notifications: MutableSet<String> = mutableSetOf(),
 ) {
     // Default constructor for Hibernate
     constructor() : this(UUID.randomUUID(), mutableSetOf())
